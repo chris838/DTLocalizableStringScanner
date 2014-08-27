@@ -85,13 +85,33 @@
 	{
 		// we know the allowed formats for NSLocalizedString() macros, so we can hard-code them
 		// there's no need to parse this stuff when we know what format things must be
+        /*
 		NSArray *prefixes = [NSArray arrayWithObjects:@"NSLocalizedString", @"CFCopyLocalizedString", _customMacroPrefix, nil];
 		NSDictionary *suffixes = [NSDictionary dictionaryWithObjectsAndKeys:
 										  [NSArray arrayWithObjects:KEY, COMMENT, nil], @"",
 										  [NSArray arrayWithObjects:KEY, TABLE, COMMENT, nil], @"FromTable",
 										  [NSArray arrayWithObjects:KEY, TABLE, BUNDLE, COMMENT, nil], @"FromTableInBundle",
-										  [NSArray arrayWithObjects:KEY, TABLE, BUNDLE, VALUE, COMMENT, nil], @"WithDefaultValue",
+                                          [NSArray arrayWithObjects:KEY, TABLE, BUNDLE, VALUE, COMMENT, nil], @"WithDefaultValue",
 										  nil];
+         */
+        
+        /* Replacement Motrr prefixes and suffixes. We use short names to increase code readability. Default values are included, bundle is removed. Table is optionally included.
+         
+         I use these by defining the following macros in my Prefix file:
+         
+         #define MTLS(key, value, comment) [[NSBundle mainBundle] localizedStringForKey:(key) value:(value) table:@"Localized"]
+         #define MTLSTable(key, table, value, comment) [[NSBundle mainBundle] localizedStringForKey:(key) value:(value) table:(table)]
+         #define MTLSKey(key) [[NSBundle mainBundle] localizedStringForKey:(key) value:nil table:@"Localized"]
+         #define MTLSKeyTable(key, table) [[NSBundle mainBundle] localizedStringForKey:(key) value:nil table:(table)]
+         
+         Note that MTLSKey and MTLSKeyTable are "passive" only, in that they are not picked up by the string parser. This is because I use them only to pull from existing strings tables and not to generate tables themselves. This is useful when, for example, generating a StandardGUI.strings file from one project and re-using it in a second project.
+         
+         */
+        NSArray *prefixes = [NSArray arrayWithObjects:@"MTLS", nil];
+		NSDictionary *suffixes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  [NSArray arrayWithObjects:KEY, VALUE, COMMENT, nil], @"",
+                                  [NSArray arrayWithObjects:KEY, TABLE, VALUE, COMMENT, nil], @"Table",
+                                  nil];
 		
 		NSMutableDictionary *validMacros = [NSMutableDictionary dictionary];
 		for (NSString *prefix in prefixes)
